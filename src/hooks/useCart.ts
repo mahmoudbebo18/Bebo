@@ -61,7 +61,7 @@ const useCart = () => {
             );
 
             // 3. Step 1: Auth with Paymob
-            const payToken = await fetch("http://localhost:5000/api/paymob/auth", {
+            const payToken = await fetch("https://ecommerce-backend-mu-eight.vercel.app/api/paymob/auth", {
                 method: "POST",
             });
             const payTokenData = await payToken.json();
@@ -74,7 +74,7 @@ const useCart = () => {
                 })),
                 userId: user?.id,
             };
-            const orderRes = await fetch("http://localhost:5000/api/paymob/order", {
+            const orderRes = await fetch("https://ecommerce-backend-mu-eight.vercel.app/api/paymob/order", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
@@ -93,7 +93,7 @@ const useCart = () => {
             }
             console.log("paymentKeyData", paymentKeyData);
             
-            const paymentKeyRes = await fetch("http://localhost:5000/api/paymob/payment-key", {
+            const paymentKeyRes = await fetch("https://ecommerce-backend-mu-eight.vercel.app/api/paymob/payment-key", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(paymentKeyData),
