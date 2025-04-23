@@ -77,7 +77,7 @@ const Checkout = () => {
         
         
         try {
-            await fetch("http://localhost:5000/paymob/auth", {
+            await fetch("https://bebo-backend.vercel.app/paymob/auth", {
                 method: "POST",
             });
 
@@ -89,7 +89,7 @@ const Checkout = () => {
                 userId: user.id,
             };
 
-            const orderRes = await fetch("http://localhost:5000/paymob/order", {
+            const orderRes = await fetch("https://bebo-backend.vercel.app/paymob/order", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(prodData),
@@ -110,7 +110,7 @@ const Checkout = () => {
                 notes: notes || "",
             };
 
-            const paymentKeyRes = await fetch("http://localhost:5000/paymob/payment-key", {
+            const paymentKeyRes = await fetch("https://bebo-backend.vercel.app/paymob/payment-key", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(paymentKeyData),
