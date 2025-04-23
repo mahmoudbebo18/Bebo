@@ -13,6 +13,7 @@ type TResponse = {
         id: string;
         firstName: string;
         lastName: string;
+        email: string;
     }
 }
 const loginAuth = createAsyncThunk("auth/loginAuth", async (formData: TFormData, thunkAPI) => {
@@ -37,6 +38,7 @@ const loginAuth = createAsyncThunk("auth/loginAuth", async (formData: TFormData,
                 id: user.uid,
                 firstName: user.displayName || "",
                 lastName: "",
+                email: user.email || "",
             },
         };
         console.log('user: ' + JSON.stringify(response));
