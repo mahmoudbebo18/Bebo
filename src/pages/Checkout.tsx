@@ -19,6 +19,8 @@ const Checkout = () => {
     const [showNewAddress, setShowNewAddress] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
+    let regulerAmount = products.reduce((acc, p) => acc + p.price * p.quantity, 0)
+
     const {
         register,
         handleSubmit,
@@ -74,8 +76,8 @@ const Checkout = () => {
         console.log("Address:", address);
         console.log("Phone Number:", phone_number);
         console.log('notes:', notes);
-        
-        
+
+
         try {
             await fetch("https://bebo-backend.vercel.app/paymob/auth", {
                 method: "POST",
@@ -171,7 +173,10 @@ const Checkout = () => {
     return (
         <Row className="mt-4">
             <Col md={{ span: 8, offset: 2 }}>
-                <h2>Checkout</h2>
+                <div className="d-flex align-items-center justify-content-between">
+                    <h2>Checkout</h2>
+                    <span> {regulerAmount}EGP </span>
+                </div>
                 <Form onSubmit={handleSubmit(onSubmit)}>
                     <input type="hidden" {...register("selectedAddressIndex")} />
 
