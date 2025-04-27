@@ -31,7 +31,7 @@ const PaymentFeedback = () => {
                 type={lottieType}
                 message={paymentStatus}
             />
-            <p> Order Number: {orderId}</p>
+            <p className='text-center'> Order Number: {orderId}</p>
         </div>
     );
 };
