@@ -10,10 +10,12 @@ const Cart = lazy(() => import('../pages/Cart'))
 const Wishlist = lazy(() => import('../pages/Wishlist'))
 const Categories = lazy(() => import('../pages/Categories'))
 const Profile = lazy(() => import('../pages/Profile'))
+const Checkout = lazy(() => import('../pages/Checkout'))
+const Payment = lazy(() => import('../pages/Payment'))
 import Error from '../pages/404'
 import PageSuspenseFallback from '../components/feedback/PageSuspenseFallback/PageSuspenseFallback';
 import ProtectedRoute from '../components/AuthGard/ProtectedRoute';
-import Checkout from '../pages/Checkout';
+
 
 const router = createBrowserRouter([
     {
@@ -120,6 +122,16 @@ const router = createBrowserRouter([
                     <ProtectedRoute>
                         <PageSuspenseFallback>
                             <Checkout />
+                        </PageSuspenseFallback>
+                    </ProtectedRoute>
+                )
+            },
+            {
+                path: "payment",
+                element: (
+                    <ProtectedRoute>
+                        <PageSuspenseFallback>
+                            <Payment />
                         </PageSuspenseFallback>
                     </ProtectedRoute>
                 )
