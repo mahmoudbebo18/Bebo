@@ -34,4 +34,5 @@ export const checkoutSchema = z.object({
     }
 });
 
+export type Address = z.infer<typeof addressSchema>;
 export type CheckoutFormData = z.infer<typeof checkoutSchema>;
