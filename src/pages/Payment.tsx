@@ -1,30 +1,47 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-
-const Payment = () => {
+import LottieHandler from '../components/feedback/LottieHandler/LottieHandler';
+const PaymentFeedback = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const status = queryParams.get("success");
-    const orderId = queryParams.get("id");
+    const status = queryParams.get("status");
+    const orderId = queryParams.get("order_id");
 
-    const [paymentStatus, setPaymentStatus] = useState("");
+    const [paymentStatus, setPaymentStatus] = useState<string>('');
+    const [lottieType, setLottieType] = useState<"loading" | "success" | "error" | "pending" | "failed">("loading");
 
     useEffect(() => {
         if (status) {
-            if (status === "true") {
-                setPaymentStatus("Payment successful!");
-            } else {
-                setPaymentStatus("Failed to process payment. Please try again.");
+            switch (status) {
+                case "pending":
+                    setPaymentStatus("Pending payment...");
+                    setLottieType("pending");
+                    break;
+                case "success":
+                    setPaymentStatus("Payment successful!");
+                    setLottieType("success");
+                    break;
+                case "failed":
+                    setPaymentStatus("Payment failed!");
+                    setLottieType("failed");
+                    break;
+                default:
+                    setPaymentStatus("We couldn't find your payment status.");
+                    setLottieType("error");
+                    break;
             }
         }
     }, [status]);
 
     return (
-        <div>
-            <h2>{paymentStatus}</h2>
+        <div className="payment-feedback-container">
+            <LottieHandler
+                type={lottieType}
+                message={paymentStatus}
+            />
             <p>رقم الطلب: {orderId}</p>
         </div>
     );
 };
 
-export default Payment;
+export default PaymentFeedback;
