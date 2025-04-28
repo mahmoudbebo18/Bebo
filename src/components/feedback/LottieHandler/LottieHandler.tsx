@@ -21,9 +21,10 @@ type LottieHandlerProps = {
     type: keyof typeof lottieFilesMap;
     message?: string;
     className?: string;
+    loop?: boolean;
 };
 
-const LottieHandler = ({ type, message, className }: LottieHandlerProps) => {
+const LottieHandler = ({ type, message, className, loop }: LottieHandlerProps) => {
     const lottie = lottieFilesMap[type];
     const messageStyle =
         type === "error"
@@ -31,11 +32,11 @@ const LottieHandler = ({ type, message, className }: LottieHandlerProps) => {
             : { fontSize: "19px", marginTop: "30px" };
     const imgStyle =
         type === "error"
-            ? {width: "300" }
-            : {  width: "400px" };
+            ? { width: "300" }
+            : { width: "400px" };
     return (
         <div className={`d-flex flex-column align-items-center ${className}`}>
-            <Lottie animationData={lottie} style={imgStyle} />
+            <Lottie loop={loop} animationData={lottie} style={imgStyle} />
             {message && <h3 style={messageStyle}>{message}</h3>}
         </div>
     );

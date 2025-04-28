@@ -8,7 +8,7 @@ const PaymentFeedback = () => {
     const success = queryParams.get("success") === "true"; 
     const pending = queryParams.get("pending") === "true"; 
     const orderId = queryParams.get("id");
-
+    const loop = false;
     const [paymentStatus, setPaymentStatus] = useState<string>('');
     const [lottieType, setLottieType] = useState<"loading" | "success" | "error" | "pending" | "failed">("loading");
 
@@ -30,6 +30,7 @@ const PaymentFeedback = () => {
             <LottieHandler
                 type={lottieType}
                 message={paymentStatus}
+                loop={loop}
             />
             <p className='text-center'> Order Number: {orderId}</p>
         </div>
