@@ -10,3 +10,7 @@
 .notFound p {
     font-size: 50px;
 }
+
+.payment-feedback-lottie > div{
+    width: 300px !important;
+}
