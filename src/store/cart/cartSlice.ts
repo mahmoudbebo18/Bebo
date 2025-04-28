@@ -4,7 +4,8 @@ import getProductsByItems from "./action/getProductsByItems";
 import removeFromCart from "./action/removeFromCart";
 import updateQuantityInCart from "./action/updateQuantityInCart";
 import productIds from "./action/productIds";
-import fetchCartItems from "./action/fetchCartItems"; // Import the new thunk
+import fetchCartItems from "./action/fetchCartItems";
+import handleSuccessfulPayment from "./action/paymentSuccess";
 import { TLoading } from "../../types/shared";
 
 export interface ICartState {
@@ -129,11 +130,25 @@ const cartSlice = createSlice({
                 if (action.payload && typeof action.payload == "string") {
                     state.error = action.payload;
                 }
+            })
+            // handle successful payment
+            .addCase(handleSuccessfulPayment.pending, (state) => {
+                state.loading = "pending";
+                state.error = null;
+            })
+            .addCase(handleSuccessfulPayment.fulfilled, (state) => {
+                state.loading = "succeeded";
+            })
+            .addCase(handleSuccessfulPayment.rejected, (state, action) => {
+                state.loading = "failed";
+                if (action.payload && typeof action.payload == "string") {
+                    state.error = action.payload;
+                }
             });
     },
 });
 
-export { getProductsByItems, productIds, removeFromCart, updateQuantityInCart, fetchCartItems };
+export { getProductsByItems, productIds, removeFromCart, updateQuantityInCart, fetchCartItems, handleSuccessfulPayment };
 export const { changeQuantity, removeItem, clearCart } = cartSlice.actions;
 
 export default cartSlice.reducer;
