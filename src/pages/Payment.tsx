@@ -31,6 +31,7 @@ const PaymentFeedback = () => {
                 type={lottieType}
                 message={paymentStatus}
                 loop={loop}
+                className="payment-feedback-lottie"
             />
             <p className='text-center'> Order Number: {orderId}</p>
         </div>

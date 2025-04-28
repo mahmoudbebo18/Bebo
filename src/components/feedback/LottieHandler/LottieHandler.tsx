@@ -35,7 +35,7 @@ const LottieHandler = ({ type, message, className, loop }: LottieHandlerProps) =
             ? { width: "300" }
             : { width: "400px" };
     return (
-        <div className={`d-flex flex-column align-items-center ${className}`}>
+        <div className={`d-flex flex-column align-items-center ${className ? className : ""}`}>
             <Lottie loop={loop} animationData={lottie} style={imgStyle} />
             {message && <h3 style={messageStyle}>{message}</h3>}
         </div>
