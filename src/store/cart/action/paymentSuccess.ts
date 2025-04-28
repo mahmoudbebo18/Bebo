@@ -9,7 +9,8 @@ const handleSuccessfulPayment = createAsyncThunk(
     async (_, thunkAPI) => {
         const { rejectWithValue, dispatch, getState } = thunkAPI;
         const { auth, cart } = getState() as RootState;
-
+        console.log("auth", auth);
+        console.log("cart", cart);
         try {
             if (!auth.user?.id) {
                 throw new Error("User not authenticated");
