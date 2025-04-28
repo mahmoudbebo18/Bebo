@@ -49,7 +49,7 @@ const Checkout = () => {
     }, [user]);
 
     useEffect(() => {
-        if (selectedAddressIndex !== null && selectedAddressIndex !== undefined && savedAddresses[selectedAddressIndex]) {
+        if (selectedAddressIndex !== null && selectedAddressIndex !== undefined  && savedAddresses[selectedAddressIndex]) {
             const addr = savedAddresses[selectedAddressIndex];
             setValue("city", addr.city);
             setValue("district", addr.district);
@@ -89,7 +89,7 @@ const Checkout = () => {
             let selectedAddress: Address;
 
             if (data.selectedAddressIndex !== undefined && data.selectedAddressIndex !== null) {
-                selectedAddress = savedAddresses[data.selectedAddressIndex];
+                selectedAddress = savedAddresses[data.selectedAddressIndex ];
             } else {
                 selectedAddress = {
                     city: data.city!,
@@ -106,12 +106,10 @@ const Checkout = () => {
                     setSavedAddresses((prev) => [...prev, selectedAddress]);
                 }
             }
-            await handlePaymobCheckout(
-                selectedAddress,
-                data.phone_number,
-                products,
-                user,
-            );
+
+            
+            console.log("Proceed to payment with address:", selectedAddress);
+            await handlePaymobCheckout(selectedAddress, data.phone_number, products, user);
         } catch (error) {
             console.error(error);
         } finally {
