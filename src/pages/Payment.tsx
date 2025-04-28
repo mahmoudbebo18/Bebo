@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { useAppDispatch } from '../store/hooks';
 import { useLocation } from 'react-router-dom';
 import LottieHandler from '../components/feedback/LottieHandler/LottieHandler';
 import { handleSuccessfulPayment } from '../store/cart/cartSlice';
@@ -13,7 +13,7 @@ const PaymentFeedback = () => {
     const loop = false;
     const [paymentStatus, setPaymentStatus] = useState<string>('');
     const [lottieType, setLottieType] = useState<"loading" | "success" | "error" | "pending" | "failed">("loading");
-    const { items } = useAppSelector((state) => state.cart)
+
     useEffect(() => {
         if (pending) {
             setPaymentStatus("Pending payment...");
@@ -21,12 +21,6 @@ const PaymentFeedback = () => {
         } else if (success) {
             setPaymentStatus("Payment successful!");
             setLottieType("success");
-            const cartItemsExist = !!Object.keys(items || {}).length;
-            if (cartItemsExist) {
-                dispatch(handleSuccessfulPayment());
-            } else {
-                console.warn("Cart is empty, not dispatching handleSuccessfulPayment");
-            }
             dispatch(handleSuccessfulPayment())
         } else {
             setPaymentStatus("Payment failed!");
