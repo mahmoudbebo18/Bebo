@@ -1,6 +1,5 @@
 import { Address } from "../validations/checkoutSchema";
 import { TProduct } from "../types/product";
-import { AppDispatch } from "../store/index";
 
 export const handlePaymobCheckout = async (
     address: Address,
