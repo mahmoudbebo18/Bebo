@@ -1,68 +1,56 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { collection, getDocs, deleteDoc, doc, updateDoc, increment, addDoc, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, updateDoc, collection, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase/firebaseConfig";
-import { RootState } from "../../../store";
+import { TProduct } from "../../../types/product";
 import { clearCart } from "../cartSlice";
+interface IOrderData {
+    address: any;
+    phoneNumber: string;
+    products: TProduct[];
+    totalAmount: number;
+    userId: string;
+    status: string;
+    createdAt: Date;
+}
 
-const handleSuccessfulPayment = createAsyncThunk(
+export const handleSuccessfulPayment = createAsyncThunk(
     "cart/handleSuccessfulPayment",
-    async (_, thunkAPI) => {
-        const { rejectWithValue, dispatch, getState } = thunkAPI;
-        const { auth, cart } = getState() as RootState;
-        console.log("auth", auth);
-        console.log("cart", cart);
+    async (orderData: IOrderData, thunkAPI) => {
+        const { rejectWithValue, dispatch } = thunkAPI;
+
         try {
-            if (!auth.user?.id) {
-                throw new Error("User not authenticated");
-            }
+            const userId = orderData.userId;
 
-            const userId = auth.user.id;
-            const cartCollectionRef = collection(db, "users", userId, "cart");
-            const cartSnapshot = await getDocs(cartCollectionRef);
-
-            if (cartSnapshot.empty) {
-                throw new Error("Cart is empty");
-            }
-            const orderItems = Object.entries(cart.items).map(([productId, quantity]) => ({
-                productId,
-                quantity,
-            }));
-            const totalAmount = cart.productsFullData.reduce((sum, product) => {
-                const quantity = cart.items[product.id] || 0;
-                return sum + product.price * quantity;
-            }, 0);
-            const orderData = {
-                items: orderItems,
-                totalAmount,
-                status: "Paid",
-                createdAt: serverTimestamp(),
-            };
-
-            // 1. Create a new order under the user
-            const userOrdersRef = collection(db, "users", userId, "orders");
-            await addDoc(userOrdersRef, orderData);
-
-            // 2. Empty the cart from Firestore
-            const deletePromises = cartSnapshot.docs.map((docSnap) => deleteDoc(docSnap.ref));
-            await Promise.all(deletePromises);
-
-            // 3. Update products quantities
-            const updatePromises = Object.entries(cart.items).map(async ([productId, quantityBought]) => {
-                const productRef = doc(db, "products", productId);
-                await updateDoc(productRef, {
-                    quantity: increment(-quantityBought),
-                });
+            // 1. Create the order document
+            const orderRef = doc(collection(db, "users", userId, "orders"));
+            await setDoc(orderRef, {
+                ...orderData,
+                id: orderRef.id,
             });
-            await Promise.all(updatePromises);
 
-            // 4. Clear Redux cart state
+            // 2. Update product quantities in inventory
+            const batchUpdates = orderData.products.map(async (product) => {
+                const productRef = doc(db, "products", product.id.toString());
+                const productSnap = await getDoc(productRef);
+
+                if (productSnap.exists()) {
+                    const currentStock = productSnap.data().stock || 0;
+                    const quantity = product.quantity || 0;
+                    const newStock = currentStock - quantity;
+                    await updateDoc(productRef, {
+                        stock: newStock >= 0 ? newStock : 0,
+                    });
+                }
+            });
+
+            await Promise.all(batchUpdates);
+
+            // 3. Clear the cart (dispatch the clearCart action)
             dispatch(clearCart());
 
-            return true;
+            return orderRef.id;
         } catch (error: any) {
-            return rejectWithValue(error.message || "An unexpected error occurred during payment handling.");
+            return rejectWithValue(error.message || "Failed to process payment");
         }
     }
 );
-
-export default handleSuccessfulPayment;
