@@ -1,22 +1,31 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { collection, getDocs, deleteDoc, doc, updateDoc, increment, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc, updateDoc, increment, serverTimestamp } from "firebase/firestore";
 import { db } from "../../../firebase/firebaseConfig";
 import { RootState } from "../../../store";
 import { clearCart } from "../cartSlice";
 
+// تعديل الأكشن الموجود
 const handleSuccessfulPayment = createAsyncThunk(
     "cart/handleSuccessfulPayment",
-    async (_, thunkAPI) => {
+    async (orderId: string, thunkAPI) => {  // نمرر orderId هنا
         const { rejectWithValue, dispatch, getState } = thunkAPI;
         const { auth, cart } = getState() as RootState;
-        console.log("auth", auth);
-        console.log("cart", cart);
+
         try {
             if (!auth.user?.id) {
                 throw new Error("User not authenticated");
             }
 
             const userId = auth.user.id;
+
+            // أول حاجة: قبل ما يحصل أي حاجة في الدفع، نسجل الأوردر كـ pending
+            const orderRef = doc(db, "users", userId, "orders", orderId);
+            await updateDoc(orderRef, {
+                status: "pending",  // نسجل الأوردر كـ pending
+                createdAt: serverTimestamp(),
+            });
+
+            // نفذ باقي العملية بعد الدفع الناجح
             const cartCollectionRef = collection(db, "users", userId, "cart");
             const cartSnapshot = await getDocs(cartCollectionRef);
 
@@ -24,7 +33,7 @@ const handleSuccessfulPayment = createAsyncThunk(
                 throw new Error("Cart is empty");
             }
 
-            // Build the order data
+            // بناء بيانات الأوردر
             const orderItems = Object.entries(cart.items).map(([productId, quantity]) => ({
                 productId,
                 quantity,
@@ -38,19 +47,18 @@ const handleSuccessfulPayment = createAsyncThunk(
             const orderData = {
                 items: orderItems,
                 totalAmount,
-                status: "Paid",
+                status: "paid",  // هنحدثه بعد الدفع الناجح
                 createdAt: serverTimestamp(),
             };
 
-            // 1. Create a new order under the user
-            const userOrdersRef = collection(db, "users", userId, "orders");
-            await addDoc(userOrdersRef, orderData);
+            // 1. تحديث الأوردر للحالة "paid" بعد الدفع الناجح
+            await updateDoc(orderRef, orderData);
 
-            // 2. Empty the cart from Firestore
+            // 2. Empty cart from Firestore
             const deletePromises = cartSnapshot.docs.map((docSnap) => deleteDoc(docSnap.ref));
             await Promise.all(deletePromises);
 
-            // 3. Update products quantities
+            // 3. تحديث الكميات في قاعدة البيانات
             const updatePromises = Object.entries(cart.items).map(async ([productId, quantityBought]) => {
                 const productRef = doc(db, "products", productId);
                 await updateDoc(productRef, {

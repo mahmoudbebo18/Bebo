@@ -21,7 +21,7 @@ const PaymentFeedback = () => {
         } else if (success) {
             setPaymentStatus("Payment successful!");
             setLottieType("success");
-            dispatch(handleSuccessfulPayment())
+            dispatch(handleSuccessfulPayment(orderId ? orderId : ""));
         } else {
             setPaymentStatus("Payment failed!");
             setLottieType("failed");

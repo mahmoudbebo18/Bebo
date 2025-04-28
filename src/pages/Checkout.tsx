@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Row, Col, Form } from "react-bootstrap";
-import { useAppSelector } from "../store/hooks";
+import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from "../firebase/firebaseConfig";
 import { checkoutSchema } from "../validations/checkoutSchema";
@@ -11,9 +11,11 @@ import useCart from "../hooks/useCart";
 import SavedAddressesList from "../components/ecommerce/Address/SavedAddressesList/SavedAddressesList";
 import AddressForm from "../components/ecommerce/Address/AddressForm/AddressForm";
 import { handlePaymobCheckout } from "../util/payMobe";
+import { handleSuccessfulPayment } from "../store/cart/cartSlice";
 const Checkout = () => {
     const { products } = useCart();
     const { user } = useAppSelector((state) => state.auth);
+    const dispatch = useAppDispatch();
     const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
     const [showNewAddress, setShowNewAddress] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -106,9 +108,7 @@ const Checkout = () => {
                     setSavedAddresses((prev) => [...prev, selectedAddress]);
                 }
             }
-
-            
-            console.log("Proceed to payment with address:", selectedAddress);
+            dispatch(handleSuccessfulPayment(''))
             await handlePaymobCheckout(selectedAddress, data.phone_number, products, user);
         } catch (error) {
             console.error(error);
